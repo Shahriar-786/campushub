@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 
