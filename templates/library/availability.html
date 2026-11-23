@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Library Availability{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Live Library Seat Availability ({{ selected_date }})</h3>
+  <form method="get" class="d-flex gap-2">
+    <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" class="form-control form-control-sm">
+    <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
+  </form>
+</div>
+
+<div class="alert alert-info small">
+  <strong>Active Prototype Rules ({{ policy.version_name }}):</strong>
+  Max {{ policy.max_consecutive_sessions }} consecutive sessions per booking; no additional booking on the same operational day once confirmed; group invitees must consent within {{ policy.invite_expiry_minutes }} minutes; {{ policy.checkin_grace_minutes }}-minute check-in grace period.
+</div>
+
+{% for row in availability_rows %}
+<div class="card p-3 mb-3">
+  <h5>{{ row.zone.name }} <small class="text-muted">({{ row.zone.code }} — {{ row.zone.floor }})</small></h5>
+  <div class="row g-2">
+    {% for s in row.sessions %}
+      <div class="col-md-3">
+        <div class="border rounded p-2 bg-light">
+          <div class="fw-semibold">{{ s.session.label }}</div>
+          <div class="small text-muted">{{ s.session.start_time|time:"H:i" }} – {{ s.session.end_time|time:"H:i" }}</div>
+          {% if s.is_closed %}
+            <span class="badge bg-danger mt-1">Temporarily Closed</span>
+          {% else %}
+            <div class="mt-1"><strong>{{ s.available_count }}</strong> / {{ s.total_capacity }} seats free</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+
+{% if forecasts %}
+<div class="card p-3 border-warning">
+  <h6>Advisory ML Demand Estimate (Separate from Live Availability)</h6>
+  <p class="small text-muted mb-2">Forecasts are statistical estimates from synthetic prototype data and do not guarantee live seat availability. <a href="{% url 'forecasting:dashboard' %}">View full forecast &amp; model metrics</a>.</p>
+  <div class="d-flex flex-wrap gap-2">
+    {% for f in forecasts|slice:":8" %}
+      <span class="badge bg-light text-dark border">{{ f.zone.code }} S{{ f.session_index }}: est. {{ f.predicted_occupancy }} / {{ f.configured_capacity }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

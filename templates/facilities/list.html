@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Facility & Equipment Tickets{% endblock %}
+{% block content %}
+<h3 class="mb-3">Facility &amp; Equipment Issue Ticketing</h3>
+{% if RoleCode.STUDENT in active_roles %}
+<div class="card p-3 mb-4">
+  <h6>Report an Issue</h6>
+  <form method="post" class="row g-2">
+    {% csrf_token %}
+    <div class="col-md-2"><select name="queue_type" class="form-select"><option value="UTILITY">Utility</option><option value="IT">IT Equipment</option></select></div>
+    <div class="col-md-3"><input name="category" class="form-control" placeholder="Category (e.g. AC, Projector)" required></div>
+    <div class="col-md-3"><input name="location" class="form-control" placeholder="Building / Room" required></div>
+    <div class="col-md-2"><select name="priority" class="form-select"><option value="LOW">Low</option><option value="MEDIUM" selected>Medium</option><option value="HIGH">High</option><option value="URGENT">Urgent</option></select></div>
+    <div class="col-md-10"><input name="description" class="form-control" placeholder="Describe the issue" required></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Submit Ticket</button></div>
+  </form>
+</div>
+{% endif %}
+
+<div class="card p-3">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Queue</th><th>Category</th><th>Location</th><th>Priority</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for t in tickets %}
+      <tr>
+        <td>{{ t.queue_type }}</td>
+        <td>{{ t.category }}</td>
+        <td>{{ t.location }}</td>
+        <td><span class="badge bg-warning text-dark">{{ t.priority }}</span></td>
+        <td><span class="badge bg-secondary">{{ t.status }}</span></td>
+        <td><a class="btn btn-sm btn-outline-primary" href="{% url 'facilities:detail' t.id %}">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

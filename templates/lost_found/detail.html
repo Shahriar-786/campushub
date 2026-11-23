@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Lost & Found Case{% endblock %}
+{% block content %}
+<h3 class="mb-3">{{ report }}</h3>
+<div class="card p-3 mb-3">
+  <p><strong>Status:</strong> {{ report.status }} | <strong>Location:</strong> {{ report.location_hint }}</p>
+  <p><strong>Public Description:</strong> {{ report.public_description }}</p>
+  {% if can_view_private %}
+    <p class="text-danger"><strong>Private Verification Details (Restricted):</strong> {{ report.private_details|default:"None" }}</p>
+  {% endif %}
+</div>
+
+{% if RoleCode.STUDENT in active_roles and report.status == "ACTIVE" %}
+<div class="card p-3 mb-3">
+  <h6>Submit Ownership Claim</h6>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="submit_claim">
+    <textarea name="evidence_summary" class="form-control mb-2" placeholder="Describe secret distinguishing proof of ownership" required></textarea>
+    <button class="btn btn-primary btn-sm" type="submit">Submit Claim</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card p-3">
+  <h6>Ownership Claims ({{ report.claims.count }})</h6>
+  {% for c in report.claims.all %}
+    <div class="border-bottom py-2">
+      <div><strong>{{ c.claimant.institutional_id }}</strong> — <span class="badge bg-secondary">{{ c.status }}</span></div>
+      <div class="small">{{ c.evidence_summary }}</div>
+    </div>
+  {% empty %}
+    <p class="text-muted small mb-0">No claims submitted yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

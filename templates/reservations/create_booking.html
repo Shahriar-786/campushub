@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Book Library Seat{% endblock %}
+{% block content %}
+<h3 class="mb-3">Create Individual or Group Reservation</h3>
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="idempotency_key" value="{{ idempotency_key }}">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Booking Type</label>
+        <select name="booking_type" class="form-select">
+          <option value="INDIVIDUAL">Individual</option>
+          <option value="GROUP">Group (Requires Invitee Consent)</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Your Seat</label>
+        <select name="seat_id" class="form-select" required>
+          {% for s in seats %}<option value="{{ s.id }}">{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Sessions (Max 2 Consecutive)</label>
+        <select name="session_ids" class="form-select" multiple size="4" required>
+          {% for sess in sessions %}<option value="{{ sess.id }}">{{ sess }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Optional Group Invitee Institutional ID</label>
+        <input type="text" name="invitee_id" class="form-control" placeholder="e.g. DIU-STU-002">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Invitee Seat (if Group)</label>
+        <select name="invitee_seat_id" class="form-select">
+          <option value="">— None —</option>
+          {% for s in seats %}<option value="{{ s.id }}">{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Submit Reservation</button>
+  </form>
+</div>
+{% endblock %}

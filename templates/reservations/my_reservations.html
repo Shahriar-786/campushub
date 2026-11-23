@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}My Reservations{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>My Library Reservations</h3>
+  <a href="{% url 'reservations:create_booking' %}" class="btn btn-primary">+ New Booking</a>
+</div>
+
+{% if pending_invites %}
+<div class="card p-3 mb-3 border-primary">
+  <h5>Pending Group Invitations (Consent Required)</h5>
+  {% for inv in pending_invites %}
+    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+      <div>Invited by <strong>{{ inv.reservation.creator.full_name }}</strong> for {{ inv.reservation.operational_date }}</div>
+      <form method="post" action="{% url 'reservations:respond_invite' inv.reservation.id %}" class="d-flex gap-2">
+        {% csrf_token %}
+        <button name="decision" value="accept" class="btn btn-sm btn-success">Accept</button>
+        <button name="decision" value="decline" class="btn btn-sm btn-outline-danger">Decline</button>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card p-3">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Session</th><th>Seat</th><th>State</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for a in allocations %}
+      <tr>
+        <td>{{ a.session }}</td>
+        <td>{{ a.seat }}</td>
+        <td><span class="badge bg-secondary">{{ a.allocation_state }}</span></td>
+        <td class="d-flex gap-1">
+          {% if a.allocation_state == "CONFIRMED" %}
+            <form method="post" action="{% url 'reservations:checkin' a.id %}">{% csrf_token %}<button class="btn btn-sm btn-success">Check In</button></form>
+            <form method="post" action="{% url 'reservations:cancel_booking' a.reservation.id %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Cancel</button></form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-muted">No allocations yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

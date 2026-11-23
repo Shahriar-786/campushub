@@ -1,0 +1,69 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CampusHub{% endblock %} | DIU Capstone Prototype</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/campushub.css' %}" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="prototype-banner py-1 px-3 text-center">
+    <strong>Academic Capstone Prototype</strong> — Modelled around DIU context using clearly labelled synthetic data (Not an official DIU production service).
+  </div>
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-campushub">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{% url 'dashboards:home' %}">CampusHub</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        {% if user.is_authenticated %}
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'library:availability' %}">Library</a></li>
+          {% if RoleCode.STUDENT in active_roles %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'reservations:my_reservations' %}">My Bookings</a></li>
+          {% endif %}
+          {% if RoleCode.LIBRARY_STAFF in active_roles or RoleCode.LIBRARY_SUPERVISOR in active_roles %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'reservations:staff_operations' %}">Library Ops</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'library:manage_closures' %}">Closures</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'forecasting:dashboard' %}">ML Forecast</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'lost_found:list' %}">Lost &amp; Found</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'facilities:list' %}">Facilities</a></li>
+          {% if RoleCode.SYSTEM_ADMIN in active_roles %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:user_management' %}">Admin Users</a></li>
+          {% endif %}
+          {% if RoleCode.SYSTEM_ADMIN in active_roles or RoleCode.LIBRARY_SUPERVISOR in active_roles or RoleCode.IT_STAFF in active_roles or RoleCode.MANAGEMENT_OFFICER in active_roles %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'audit:list' %}">Audit Log</a></li>
+          {% endif %}
+        </ul>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn btn-sm btn-outline-light" href="{% url 'notifications:list' %}">Alerts</a>
+          <span class="text-light small">{{ user.institutional_id }}</span>
+          <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-warning" type="submit">Sign out</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

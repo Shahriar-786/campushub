@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}ML Demand Forecast{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Mandatory ML Library Demand Forecast</h3>
+  {% if RoleCode.LIBRARY_SUPERVISOR in active_roles or RoleCode.SYSTEM_ADMIN in active_roles %}
+    <form method="post">{% csrf_token %}<button class="btn btn-primary btn-sm" type="submit">Re-run Forecast Pipeline</button></form>
+  {% endif %}
+</div>
+
+{% if latest_run %}
+<div class="alert alert-warning small">
+  <strong>Caveat &amp; Provenance:</strong> {{ latest_run.caveat_text }}<br>
+  <strong>Model:</strong> {{ latest_run.model_version }} | <strong>Train Window:</strong> {{ latest_run.model_version.train_period }} |
+  <strong>Generated:</strong> {{ latest_run.created_at|date:"Y-m-d H:i" }} UTC | <strong>Horizon:</strong> {{ latest_run.horizon_days }} days
+</div>
+
+<div class="row g-3 mb-3">
+  {% for m in latest_run.metrics.all %}
+    <div class="col-md-4">
+      <div class="card p-3">
+        <div class="small text-muted">{{ m.metric_name }} ({{ m.split_name }})</div>
+        <div>Model: <strong>{{ m.model_value }}</strong> vs. Naive Baseline: <strong>{{ m.baseline_value }}</strong></div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="card p-3">
+  <canvas id="forecastChart" height="100"></canvas>
+</div>
+<script>
+new Chart(document.getElementById("forecastChart"), {
+  type: "bar",
+  data: {
+    labels: {{ chart_labels_json|safe }},
+    datasets: [
+      { label: "Predicted Demand (Estimate)", data: {{ chart_predicted_json|safe }}, backgroundColor: "rgba(29, 111, 165, 0.75)" },
+      { label: "Configured Capacity", data: {{ chart_capacity_json|safe }}, type: "line", borderColor: "#dc3545", tension: 0.2 }
+    ]
+  }
+});
+</script>
+{% else %}
+<div class="alert alert-secondary">No forecast runs published yet.</div>
+{% endif %}
+{% endblock %}

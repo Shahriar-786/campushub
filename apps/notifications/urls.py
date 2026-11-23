@@ -1,0 +1,10 @@
+from django.urls import path
+
+from apps.notifications import views
+
+app_name = "notifications"
+
+urlpatterns = [
+    path("", views.notification_list_view, name="list"),
+    path("<uuid:pk>/read/", views.mark_read_view, name="mark_read"),
+]

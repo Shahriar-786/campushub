@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-0">Welcome, {{ user.full_name }}</h3>
+    <small class="text-muted">Active Roles: {% for r in roles %}<span class="badge bg-primary me-1">{{ r }}</span>{% endfor %}</small>
+  </div>
+  {% if RoleCode.STUDENT in active_roles %}
+    <a href="{% url 'reservations:create_booking' %}" class="btn btn-primary">+ Book Library Seat</a>
+  {% endif %}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Confirmed Reservations</div><h3>{{ metrics.active_reservations }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Open Facility Tickets</div><h3>{{ metrics.open_tickets }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Active Lost &amp; Found</div><h3>{{ metrics.active_lf_reports }}</h3></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted small">ML Forecast Runs</div><h3>{{ metrics.forecast_runs }}</h3></div></div>
+</div>
+
+{% if my_allocations %}
+<div class="card p-3 mb-3">
+  <h5>My Recent Seat Allocations</h5>
+  <ul class="list-group list-group-flush">
+    {% for a in my_allocations %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span>{{ a.session }} — Seat <strong>{{ a.seat }}</strong></span>
+        <span class="badge bg-info text-dark">{{ a.allocation_state }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if recent_audits %}
+<div class="card p-3">
+  <h5>Recent Audit Trail (Admin / IT View)</h5>
+  <table class="table table-sm mb-0">
+    <thead><tr><th>Time</th><th>Action</th><th>Target</th><th>Reason</th></tr></thead>
+    <tbody>
+      {% for ev in recent_audits %}
+        <tr><td>{{ ev.created_at|date:"Y-m-d H:i" }}</td><td><code>{{ ev.action }}</code></td><td>{{ ev.target_type }}</td><td>{{ ev.reason }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

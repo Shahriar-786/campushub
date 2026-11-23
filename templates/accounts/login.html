@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Sign In{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-5">
+    <div class="card p-4">
+      <h3 class="mb-3">Sign in to CampusHub</h3>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Institutional ID</label>
+          <input type="text" name="institutional_id" class="form-control" placeholder="e.g. DIU-STU-001" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Sign In</button>
+      </form>
+      <hr>
+      <p class="small text-muted mb-1"><strong>Demo Prototype Accounts</strong> (Password: <code>CampusHub@2026</code>):</p>
+      <p class="small text-muted mb-0">
+        <code>DIU-STU-001</code>, <code>DIU-STU-002</code>, <code>DIU-LIB-001</code>, <code>DIU-SUP-001</code>,
+        <code>DIU-LFR-001</code>, <code>DIU-SEC-001</code>, <code>DIU-IT-001</code>, <code>DIU-UTL-001</code>,
+        <code>DIU-MGT-001</code>, <code>DIU-ADM-001</code>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Library Operations{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Library Staff &amp; Supervisor Operations</h3>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="operation" value="release_no_shows">
+    <button class="btn btn-warning btn-sm" type="submit">Run No-Show Release Sweep</button>
+  </form>
+</div>
+<div class="card p-3">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Attendee</th><th>Session</th><th>Seat</th><th>State</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for a in allocations %}
+      <tr>
+        <td>{{ a.attendee.institutional_id }}</td>
+        <td>{{ a.session }}</td>
+        <td>{{ a.seat }}</td>
+        <td><span class="badge bg-secondary">{{ a.allocation_state }}</span></td>
+        <td>
+          {% if a.allocation_state == "CONFIRMED" %}
+            <form method="post" action="{% url 'reservations:checkin' a.id %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-success">Staff Check-In</button></form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

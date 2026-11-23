@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Lost & Found{% endblock %}
+{% block content %}
+<h3 class="mb-3">Lost &amp; Found Registry</h3>
+{% if RoleCode.STUDENT in active_roles or RoleCode.LF_REVIEWER in active_roles %}
+<div class="card p-3 mb-4">
+  <h6>Submit Lost or Found Report</h6>
+  <form method="post" class="row g-2">
+    {% csrf_token %}
+    <div class="col-md-2"><select name="report_type" class="form-select"><option value="LOST">Lost</option><option value="FOUND">Found</option></select></div>
+    <div class="col-md-3"><input name="category" class="form-control" placeholder="Category (e.g. ID Card, Wallet)" required></div>
+    <div class="col-md-4"><input name="location_hint" class="form-control" placeholder="Approximate location" required></div>
+    <div class="col-md-6"><input name="public_description" class="form-control" placeholder="Safe public description (no secret marks)" required></div>
+    <div class="col-md-4"><input name="private_details" class="form-control" placeholder="Private identifying details (reviewer only)"></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Submit</button></div>
+  </form>
+</div>
+{% endif %}
+
+<div class="card p-3">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Type</th><th>Category</th><th>Location</th><th>Public Summary</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for r in reports %}
+      <tr>
+        <td><span class="badge bg-info text-dark">{{ r.report_type }}</span></td>
+        <td>{{ r.category }}</td>
+        <td>{{ r.location_hint }}</td>
+        <td>{{ r.public_description }}</td>
+        <td><span class="badge bg-secondary">{{ r.status }}</span></td>
+        <td><a class="btn btn-sm btn-outline-primary" href="{% url 'lost_found:detail' r.id %}">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

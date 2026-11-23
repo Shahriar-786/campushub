@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}User & Role Management{% endblock %}
+{% block content %}
+<h3 class="mb-3">System Administrator — Accounts &amp; Roles</h3>
+<div class="card p-3">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>ID</th><th>Name</th><th>Active</th><th>Roles</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td><code>{{ u.institutional_id }}</code></td>
+        <td>{{ u.full_name }}</td>
+        <td>{{ u.is_active|yesno:"Active,Disabled" }}</td>
+        <td>{% for r in u.active_role_codes %}<span class="badge bg-secondary me-1">{{ r }}</span>{% endfor %}</td>
+        <td>
+          <form method="post" class="d-inline-flex gap-1">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <input type="hidden" name="action" value="assign_role">
+            <select name="role_code" class="form-select form-select-sm">
+              {% for role in roles %}<option value="{{ role.code }}">{{ role.name }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-sm btn-outline-primary" type="submit">Assign</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

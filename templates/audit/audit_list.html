@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+<h3 class="mb-3">Immutable Audit Trail</h3>
+<div class="card p-3">
+  <table class="table table-sm">
+    <thead><tr><th>UTC Timestamp</th><th>Actor</th><th>Action</th><th>Target</th><th>Reason</th></tr></thead>
+    <tbody>
+      {% for ev in events %}
+      <tr>
+        <td>{{ ev.created_at|date:"Y-m-d H:i:s" }}</td>
+        <td>{{ ev.actor.institutional_id|default:"SYSTEM" }}</td>
+        <td><code>{{ ev.action }}</code></td>
+        <td>{{ ev.target_type }}:{{ ev.target_id|slice:":8" }}</td>
+        <td>{{ ev.reason }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

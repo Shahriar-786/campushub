@@ -1,0 +1,27 @@
+# Render Blueprint for $0 Free Tier Web Service paired with Neon Free PostgreSQL
+services:
+  - type: web
+    name: campushub-prototype
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2"
+    healthCheckPath: "/health/"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.1"
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: TIME_ZONE
+        value: "Asia/Dhaka"
+      - key: SEED_DEMO_DATA
+        value: "True"
+      - key: DATABASE_URL
+        sync: false
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false

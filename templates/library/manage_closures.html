@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Temporary Closures{% endblock %}
+{% block content %}
+<h3 class="mb-3">Temporary Seat &amp; Zone Closures</h3>
+<div class="card p-3 mb-4">
+  <form method="post" class="row g-2">
+    {% csrf_token %}
+    <div class="col-md-2">
+      <select name="closure_type" class="form-select"><option value="zone">Zone</option><option value="seat">Seat</option></select>
+    </div>
+    <div class="col-md-3">
+      <select name="zone_id" class="form-select">{% for z in zones %}<option value="{{ z.id }}">{{ z }}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-3">
+      <select name="seat_id" class="form-select">{% for s in seats %}<option value="{{ s.id }}">{{ s }}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-2"><input type="datetime-local" name="start_at" class="form-control" required></div>
+    <div class="col-md-2"><input type="datetime-local" name="end_at" class="form-control" required></div>
+    <div class="col-md-10"><input type="text" name="reason" class="form-control" placeholder="Mandatory closure reason" required></div>
+    <div class="col-md-2"><button class="btn btn-danger w-100" type="submit">Apply Closure</button></div>
+  </form>
+</div>
+{% endblock %}
